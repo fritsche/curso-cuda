@@ -1,0 +1,1 @@
+/home/prof/wagner/netpbm/converter/tga.h

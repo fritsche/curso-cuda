@@ -1,0 +1,6 @@
+# cuda env variables for orval, achel, latrappe machines
+export PATH="/usr/local/cuda/bin:/usr/local/nvidia-latest/bin:$PATH"
+export LD_LIBRARY_PATH="/use/local/cuda/lib64:/usr/local/nvidia-latest/lib64:$LD_LIBRARY_PATH"
+# before was
+# export LD_LIBRARY_PATH=/usr/local/cuda-7.0/lib:/usr/local/cuda-7.0/lib64:$LD_LIBRARY_PATH
+# export PATH=/usr/local/cuda-7.0/bin:$PATH

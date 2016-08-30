@@ -1,0 +1,1 @@
+./ImageBlur -i Dataset/0/input.ppm  -o Dataset/0/output.ppm

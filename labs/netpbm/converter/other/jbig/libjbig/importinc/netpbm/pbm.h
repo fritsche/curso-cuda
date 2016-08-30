@@ -1,0 +1,1 @@
+/home/prof/wagner/netpbm/lib/pbm.h

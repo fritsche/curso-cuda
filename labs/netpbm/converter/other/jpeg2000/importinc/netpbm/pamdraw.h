@@ -1,0 +1,1 @@
+/home/prof/wagner/netpbm/lib/pamdraw.h

@@ -1,0 +1,1 @@
+/home/prof/wagner/netpbm/lib/util/wordaccess_be_aligned.h
