@@ -31,7 +31,6 @@ __global__ void imageBlur (unsigned char* in, unsigned char* out,
     int pixValG = 0;
     int pixValB = 0;
     int pixels = 0;
-    // Get the average of the surrounding 2xBLUR_SIZE x 2xBLUR_SIZE box
     for (int blurRow = -BLUR_SIZE; blurRow < BLUR_SIZE+1; ++blurRow) {
       for (int blurCol = -BLUR_SIZE; blurCol < BLUR_SIZE+1; ++blurCol) {
         int curRow = Row + blurRow;
@@ -80,8 +79,7 @@ int main(int argc, char *argv[]) {
   imageWidth  = wbImage_getWidth(inputImage);
   imageHeight = wbImage_getHeight(inputImage);
 
-  // Since the image is monochromatic, it only contains only one channel
-  outputImage = wbImage_new(imageWidth, imageHeight, 1);
+  outputImage = wbImage_new(imageWidth, imageHeight, CHANNELS);
 
   hostInputImageData  = wbImage_getData(inputImage);
   hostOutputImageData = wbImage_getData(outputImage);
@@ -112,7 +110,7 @@ int main(int argc, char *argv[]) {
   ///////////////////////////////////////////////////////
   wbTime_start(Copy, "Copying data from the GPU");
   cudaMemcpy(hostOutputImageData, deviceOutputImageData,
-             imageWidth * imageHeight * sizeof(unsigned char),
+             imageWidth * imageHeight * CHANNELS * sizeof(unsigned char),
              cudaMemcpyDeviceToHost);
   wbTime_stop(Copy, "Copying data from the GPU");
 
