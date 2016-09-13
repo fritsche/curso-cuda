@@ -15,6 +15,19 @@
 #define BLUR_SIZE 5
 #define CHANNELS 3
 
+#define GTX480   480
+#define GTX680   680
+#define GPU     GTX680
+#if GPU == GTX480
+  #define MP    15  // number of mutiprocessors (SMs) in GTX480
+  #define GRID1 (MP*2) // GRID size
+  #define NT1   768
+#elif GPU == GTX680
+  #define MP    8 // number of mutiprocessors (SMs) in GTX680
+  #define GRID1 (MP*2)
+  #define NT1    1024
+#endif
+
 int main(int argc, char *argv[]) {
   wbArg_t args;
   int imageWidth;
