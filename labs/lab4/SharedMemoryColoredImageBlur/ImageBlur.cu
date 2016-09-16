@@ -1,6 +1,5 @@
-//#include <wb.h>
-#include "/home/prof/wagner/ci853/labs/wb4.h" // use our lib instead (under construction)
-
+#include "wb4.h"
+//#include "/home/prof/wagner/ci853/labs/wb4.h" // use our lib instead (under construction)
 
 #define wbCheck(stmt)                                                     \
   do {                                                                    \
@@ -33,29 +32,39 @@ __global__ void rgb2uintKernelSHM (unsigned int* inputImage, unsigned int* outpu
   __shared__ unsigned int sharedInputImage [NT1];
   unsigned char * ucharInputImage = ( unsigned char *) sharedInputImage;
 
-  // the thread index
+  // unique thread index
   int index = threadIdx.x + blockIdx.x * blockDim.x;
-
+  int indexAtImage;
   char r, g, b;
 
   // iterate over the tiles
-  for (int i = 0; i < imageHeight*imageWidth/NT1; ++i)
+  for (int i = 0; i < imageHeight*imageWidth/(float)NT1; ++i)
   {
+
     // a thread can be outside the image?
-    if (! index+i*NT1 > imageWidth*imageHeight) {
+    indexAtImage = index+i*NT1;
+    // (((inputLength-1)/blockDim)+1)
+    if ( indexAtImage < (imageWidth*imageHeight*CHANNELS/4.0) + 1) {
       // load the chunk
-      sharedInputImage[index] = inputImage[index+i*NT1];
+      sharedInputImage[threadIdx.x] = inputImage[indexAtImage];
     }
     __syncthreads();
 
+    if ( indexAtImage < imageWidth*imageHeight) {
+     
+      r = ucharInputImage[threadIdx.x*CHANNELS+0];
+      g = ucharInputImage[threadIdx.x*CHANNELS+1];
+      b = ucharInputImage[threadIdx.x*CHANNELS+2];
 
-    r = ucharInputImage[index+0];
-    g = ucharInputImage[index+1];
-    b = ucharInputImage[index+2];
-    unsigned int v = ((unsigned int)r << 16) + ((unsigned int)g << 8) + (unsigned int)b;
+      // printf("[%d %d %d]\n", r, g, b);
 
-    outputImage[index+i*NT1] = v;
+      unsigned int v = ((unsigned int)r << 16) + ((unsigned int)g << 8) + (unsigned int)b;
 
+      // printf("%u\n",v);
+
+      outputImage[index+i*NT1] = v;
+    }
+    __syncthreads();
   }
 
 }
@@ -86,11 +95,30 @@ int main(int argc, char *argv[]) {
   hostInputImageData  = wbImage_getData(inputImage);
   hostOutputImageData = wbImage_getData(outputImage);
 
+  /// TESTE
+  hostInputImageData = (unsigned char*) malloc (sizeof(unsigned char) * 12);
+  hostInputImageData[0] = 0;
+  hostInputImageData[1] = 1;
+  hostInputImageData[2] = 2;
+  hostInputImageData[3] = 3;
+  hostInputImageData[4] = 4;
+  hostInputImageData[5] = 5;
+  hostInputImageData[6] = 6;
+  hostInputImageData[7] = 7;
+  hostInputImageData[8] = 8;
+  hostInputImageData[9] = 9;
+  hostInputImageData[10] = 10;
+  hostInputImageData[11] = 11;
+
+  imageWidth  = 4;
+  imageHeight = 1;
+  /// TESTE
+  
   wbTime_start(GPU, "Doing GPU Computation (memory + compute)");
 
   wbTime_start(GPU, "Doing GPU memory allocation");
   cudaMalloc((void **)&deviceInputImageData,
-             imageWidth * imageHeight * CHANNELS * sizeof(unsigned char) + 3);
+             imageWidth * imageHeight * CHANNELS * sizeof(unsigned char) + 7);
   cudaMalloc((void **)&deviceOutputImageData,
              imageWidth * imageHeight * CHANNELS * sizeof(unsigned char));
   wbTime_stop(GPU, "Doing GPU memory allocation");
@@ -116,12 +144,12 @@ int main(int argc, char *argv[]) {
   rgb2uintKernelSHM<<<GRID1, NT1>>> (deviceAuxInputImage, deviceConvertedImage, imageHeight, imageWidth);
 
   cudaMemcpy(hostConvertedImage, deviceConvertedImage,
-             imageWidth * imageHeight * CHANNELS * sizeof(unsigned char),
+             imageWidth * imageHeight * CHANNELS * sizeof(unsigned int),
              cudaMemcpyDeviceToHost);
 
   for (int i = 0; i < imageWidth * imageHeight * CHANNELS; ++i)
   {
-    printf("%d\n", hostConvertedImage[i]);
+    printf("%u\n", hostConvertedImage[i]);
   }
 
   // //@@ INSERT CODE HERE
