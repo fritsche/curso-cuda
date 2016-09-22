@@ -96,21 +96,24 @@ int main(int argc, char *argv[]) {
   hostOutputImageData = wbImage_getData(outputImage);
 
   /// TESTE
-  hostInputImageData = (unsigned char*) malloc (sizeof(unsigned char) * 12);
+  hostInputImageData = (unsigned char*) malloc (sizeof(unsigned char) * 15);
   hostInputImageData[0] = 0;
   hostInputImageData[1] = 1;
-  hostInputImageData[2] = 2;
+  hostInputImageData[2] = 2; // 258
   hostInputImageData[3] = 3;
   hostInputImageData[4] = 4;
-  hostInputImageData[5] = 5;
+  hostInputImageData[5] = 5; // 197637
   hostInputImageData[6] = 6;
   hostInputImageData[7] = 7;
-  hostInputImageData[8] = 8;
+  hostInputImageData[8] = 8; // 395016
   hostInputImageData[9] = 9;
   hostInputImageData[10] = 10;
-  hostInputImageData[11] = 11;
+  hostInputImageData[11] = 11; // 592395
+  hostInputImageData[12] = 0;
+  hostInputImageData[13] = 1;
+  hostInputImageData[14] = 2; // 258
 
-  imageWidth  = 4;
+  imageWidth  = 5;
   imageHeight = 1;
   /// TESTE
   
@@ -147,7 +150,7 @@ int main(int argc, char *argv[]) {
              imageWidth * imageHeight * CHANNELS * sizeof(unsigned int),
              cudaMemcpyDeviceToHost);
 
-  for (int i = 0; i < imageWidth * imageHeight * CHANNELS; ++i)
+  for (int i = 0; i < imageWidth * imageHeight; ++i)
   {
     printf("%u\n", hostConvertedImage[i]);
   }
